@@ -26,6 +26,11 @@ def handle_400(error):
     return error_information(error)
 
 
+@app.errorhandler(404)
+def handle_400(error):
+    return error_information(error)
+
+
 @app.route('/')
 def root():
     return jsonify(title='Soundphy RESTful API', versions=[0.1])
@@ -37,6 +42,11 @@ def reverse():
     if query is None:
         abort(400, 'Missing required parameter `query`')
     return jsonify(reverse=query[::-1])
+
+
+@app.route('/<path:path>', methods=['GET', 'POST'])
+def catch_all(path):
+    abort(404, 'Requested API call does not exist')
 
 
 if __name__ == '__main__':
