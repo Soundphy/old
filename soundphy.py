@@ -12,7 +12,7 @@ app = Flask('Soundphy')
 
 @app.errorhandler(400)
 def handle_400(e):
-    return jsonify(error=str(e))
+    return jsonify(error=str(e)), 400
 
 
 @app.route('/')
