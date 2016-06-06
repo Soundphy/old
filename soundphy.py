@@ -31,7 +31,7 @@ def root():
     return 'Hello World!'
 
 
-@app.route('/api/v0.1/reverse')
+@app.route('/v0.1/reverse')
 def reverse():
     query = request.args.get('query')
     if query is None:
