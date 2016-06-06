@@ -10,9 +10,20 @@ from flask import jsonify
 app = Flask('Soundphy')
 
 
+def error_information(error):
+    info = {}
+    info['code'] = error.code
+    info['name'] = error.name
+    if error.response:
+        info['response'] = error.response
+    if error.description:
+        info['description'] = error.description
+    return jsonify(error=info), error.code
+
+
 @app.errorhandler(400)
-def handle_400(e):
-    return jsonify(error=str(e)), 400
+def handle_400(error):
+    return error_information(error)
 
 
 @app.route('/')
@@ -24,7 +35,7 @@ def root():
 def reverse():
     query = request.args.get('query')
     if query is None:
-        abort(400)
+        abort(400, 'Missing required parameter `query`')
     return jsonify(reverse=query[::-1])
 
 
