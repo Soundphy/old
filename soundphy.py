@@ -36,11 +36,8 @@ def root():
     return jsonify(title='Soundphy RESTful API', versions=[0.1])
 
 
-@app.route('/v0.1/reverse')
-def reverse():
-    query = request.args.get('query')
-    if query is None:
-        abort(400, 'Missing required parameter `query`')
+@app.route('/v0.1/reverse/<string:query>')
+def reverse(query):
     return jsonify(reverse=query[::-1])
 
 
