@@ -1,6 +1,7 @@
 """
 Soundphy RESTful API.
 """
+import inspect
 from flask import Flask
 from flask import abort
 from flask import request
@@ -8,6 +9,22 @@ from flask import jsonify
 
 
 app = Flask('Soundphy')
+
+
+def list_routes(app, starting=''):
+    output = []
+    for rule in app.url_map.iter_rules():
+        if rule.endpoint.startswith('_'):
+            continue
+        if not str(rule).startswith(starting):
+            continue
+        output.append(dict(
+            name=rule.endpoint,
+            rule=rule.rule,
+            methods=','.join(rule.methods),
+            doc=inspect.getdoc(app.view_functions[rule.endpoint])
+        ))
+    return output
 
 
 def error_information(error):
@@ -33,7 +50,12 @@ def handle_400(error):
 
 @app.route('/')
 def root():
-    return jsonify(title='Soundphy RESTful API', versions=[0.1])
+    return jsonify(title='Soundphy RESTful API', versions=[v0.1])
+
+
+@app.route('/v0.1')
+def routes():
+    return jsonify(routes=list_routes(app, '/v0.1'))
 
 
 @app.route('/v0.1/reverse/<string:query>')
@@ -42,7 +64,7 @@ def reverse(query):
 
 
 @app.route('/<path:path>', methods=['GET', 'POST'])
-def catch_all(path):
+def _catch_all(path):
     abort(404, 'Requested API call does not exist')
 
 
