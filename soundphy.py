@@ -50,15 +50,15 @@ def handle_400(error):
 
 @app.route('/')
 def root():
-    return jsonify(title='Soundphy RESTful API', versions=[v0.1])
+    return jsonify(title='Soundphy RESTful API', versions=[v0])
 
 
-@app.route('/v0.1')
+@app.route('/v0')
 def routes():
-    return jsonify(routes=list_routes(app, '/v0.1'))
+    return jsonify(routes=list_routes(app, '/v0'))
 
 
-@app.route('/v0.1/reverse/<string:query>')
+@app.route('/v0/reverse/<string:query>')
 def reverse(query):
     return jsonify(reverse=query[::-1])
 
