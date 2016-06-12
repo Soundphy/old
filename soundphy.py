@@ -57,7 +57,8 @@ def handle_400(error):
 
 @app.route('/')
 def root():
-    return jsonify(title='Soundphy RESTful API', versions=['v0'])
+    versions = dict(v0=request.url+'v0')
+    return jsonify(title='Soundphy RESTful API', versions=versions)
 
 
 @app.route('/v0')
