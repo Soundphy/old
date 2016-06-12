@@ -2,11 +2,18 @@
 Soundphy RESTful API.
 """
 import inspect
+import sqlite3
+import traceback
+
 from flask import Flask
 from flask import abort
 from flask import request
 from flask import jsonify
 
+from download import create_and_fill_database
+
+
+DB_NAME = 'local.db'
 
 app = Flask('Soundphy')
 
@@ -60,7 +67,35 @@ def routes():
 
 @app.route('/v0/reverse/<string:query>')
 def reverse(query):
+    """
+    Return the reversed query string provided (for testing purposes).
+    """
     return jsonify(reverse=query[::-1])
+
+
+@app.route('/v0/search/<string:query>')
+def search(query):
+    """
+    Search for a sound file in the Soundphy service.
+    """
+    db_connection = sqlite3.connect(DB_NAME)
+    c = db_connection.cursor()
+    db_query = 'SELECT url,description from test WHERE description IS ?'
+    results = c.execute(db_query, (query,)).fetchall()
+    results = [dict(url=x, description=y) for (x, y) in results]
+    return jsonify(results=results)
+
+
+@app.route('/v0/_download')
+def _download():
+    """
+    Fill the database with new data.
+    """
+    try:
+        create_and_fill_database(DB_NAME)
+    except Exception:
+        return jsonify(error=traceback.format_exc())
+    return jsonify(finished='OK')
 
 
 @app.route('/<path:path>', methods=['GET', 'POST'])
@@ -69,4 +104,4 @@ def _catch_all(path):
 
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=5000, debug=True)
+    app.run(host='localhost', port=5000, threaded=True, debug=True)
