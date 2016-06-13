@@ -2,18 +2,19 @@
 Soundphy RESTful API.
 """
 import inspect
-import sqlite3
 import traceback
+from whoosh.index import open_dir
+from whoosh.qparser import QueryParser
 
 from flask import Flask
 from flask import abort
 from flask import request
 from flask import jsonify
 
-from download import create_and_fill_database
+from download import create_schema
 
 
-DB_NAME = 'local.db'
+INDEXDIR = 'indexdir'
 
 app = Flask('Soundphy')
 
@@ -79,11 +80,11 @@ def search(query):
     """
     Search for a sound file in the Soundphy service.
     """
-    db_connection = sqlite3.connect(DB_NAME)
-    c = db_connection.cursor()
-    db_query = 'SELECT url,description from test WHERE description IS ?'
-    results = c.execute(db_query, (query,)).fetchall()
-    results = [dict(url=x, description=y) for (x, y) in results]
+    ix = open_dir(INDEXDIR)
+    with ix.searcher() as searcher:
+        results = [dict(x) for x in searcher.search(
+            QueryParser('description', ix.schema).parse(query)
+        )]
     return jsonify(results=results)
 
 
@@ -93,7 +94,7 @@ def _download():
     Fill the database with new data.
     """
     try:
-        create_and_fill_database(DB_NAME)
+        create_schema(INDEXDIR)
     except Exception:
         return jsonify(error=traceback.format_exc())
     return jsonify(finished='OK')
