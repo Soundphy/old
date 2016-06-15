@@ -3,6 +3,7 @@ import re
 import requests
 from whoosh.fields import ID
 from whoosh.fields import TEXT
+from whoosh.fields import NGRAMWORDS
 from whoosh.fields import Schema
 from whoosh.index import create_in
 
@@ -23,7 +24,7 @@ def download_instantsfun_es():
 def create_schema(index_directory):
     schema = Schema(url=ID(stored=True),
                     title=TEXT(stored=True),
-                    description=TEXT)
+                    description=NGRAMWORDS(minsize=1))
     if not os.path.isdir(index_directory):
         os.makedirs(index_directory)
     ix = create_in(index_directory, schema)
