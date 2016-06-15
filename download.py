@@ -7,6 +7,7 @@ from whoosh.fields import TEXT
 from whoosh.fields import NGRAMWORDS
 from whoosh.fields import Schema
 from whoosh.index import create_in
+from whoosh.writing import BufferedWriter
 
 
 def download_instantsfun_es():
@@ -32,25 +33,20 @@ def download_dota2_gamepedia_com():
     soup = BeautifulSoup(response.text, 'html.parser')
     heroes = soup.find_all('div', attrs={'style': 'position: relative;'})
 
-    pages = [hero.find('a').attrs['href'] for hero in heroes]
-    names = [hero.find('a').attrs['title'] for hero in heroes]
-    faces = [hero.find('img').attrs['src'] for hero in heroes]
-
-    responses = []
-    for page in pages:
+    for hero in heroes:
+        page = hero.find('a').attrs['href']
+        name = hero.find('a').attrs['title']
+        face = hero.find('img').attrs['src']
         response = requests.get(WEBPAGE + page + '/Responses')
         try:
             response.raise_for_status()
         except Exception:
-            print(page)
             continue
         soup = BeautifulSoup(response.text, 'html.parser')
         links = soup.find_all('a', attrs={'title': 'Play'})
         sounds = [link.attrs['href'] for link in links]
         descriptions = [link.parent.text.strip(' Play ') for link in links]
-        responses.append(zip(sounds, descriptions))
-
-    return zip(names, faces, responses)
+        yield (name, face, zip(sounds, descriptions))
 
 
 def create_schema(index_directory):
@@ -60,7 +56,7 @@ def create_schema(index_directory):
     if not os.path.isdir(index_directory):
         os.makedirs(index_directory)
     ix = create_in(index_directory, schema)
-    writer = ix.writer()
+    writer = BufferedWriter(ix, period=30, limit=50)
     for url, description in download_instantsfun_es():
         writer.add_document(url=url,
                             title=description,
@@ -70,7 +66,6 @@ def create_schema(index_directory):
             writer.add_document(url=sound,
                                 title='Dota2 %s '%name+description,
                                 description='Dota2 %s '%name+description)
-    writer.commit()
 
 
 if __name__ == '__main__':
