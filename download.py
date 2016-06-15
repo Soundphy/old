@@ -56,7 +56,7 @@ def create_schema(index_directory):
     if not os.path.isdir(index_directory):
         os.makedirs(index_directory)
     ix = create_in(index_directory, schema)
-    writer = BufferedWriter(ix, period=30, limit=50)
+    writer = BufferedWriter(ix, period=30, limit=1000)
     for url, description in download_instantsfun_es():
         writer.add_document(url=url,
                             title=description,
