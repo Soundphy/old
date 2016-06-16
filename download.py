@@ -23,6 +23,44 @@ def download_instantsfun_es():
     return zip(urls, descriptions)
 
 
+def download_springfieldfiles_com():
+    WEBPAGE = 'http://www.springfieldfiles.com/'
+    response = requests.get(WEBPAGE + 'index.php?jump=sounds')
+    response.raise_for_status()
+
+    for line in response.text.split('\n'):
+        aux = re.findall('<td width=..%.*<font size=3>([^<]*)<.*', line)
+        if not aux:
+            aux = re.findall('<td width=20%>([^<]*)</td>', line)
+        if aux:
+            name = aux[0]
+            continue
+        aux = re.findall('<td width=..%><a href="([^"]*)"', line)
+        if not aux:
+            continue
+        url = aux[0]
+        response = requests.get(WEBPAGE + url)
+        try:
+            response.raise_for_status()
+        except Exception:
+            continue
+        sounds = []
+        descriptions = []
+        lines = response.text.split('\n')[::-1]
+        while len(lines):
+            line = lines.pop()
+            sound = re.findall('href="(sounds[^"]*)">.*', line)
+            if not sound:
+                continue
+            line = lines.pop()
+            description = BeautifulSoup(line, 'html.parser').text
+            if not description:
+                continue
+            sounds.append(WEBPAGE + sound[0])
+            descriptions.append(description.strip('"'))
+        yield (name, zip(sounds, descriptions))
+
+
 def download_dota2_gamepedia_com():
     WEBPAGE = 'http://dota2.gamepedia.com'
 
@@ -61,6 +99,11 @@ def create_schema(index_directory):
         writer.add_document(url=url,
                             title=description,
                             description=description)
+    for name, sounds in download_springfieldfiles_com():
+        for url, description in sounds:
+            writer.add_document(url=url,
+                                title='Simpsons %s '%name+description,
+                                description='Simpsons %s '%name+description)
     for name, face, responses in download_dota2_gamepedia_com():
         for sound, description in responses:
             writer.add_document(url=sound,
