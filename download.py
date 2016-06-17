@@ -49,7 +49,7 @@ def download_springfieldfiles_com():
         lines = response.text.split('\n')[::-1]
         while len(lines):
             line = lines.pop()
-            sound = re.findall('href="(sounds[^"]*)">.*', line)
+            sound = re.findall('href="(sounds[^"]*.mp3)">.*', line)
             if not sound:
                 continue
             line = lines.pop()
