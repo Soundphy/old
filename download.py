@@ -87,6 +87,29 @@ def download_dota2_gamepedia_com():
         yield (name, face, zip(sounds, descriptions))
 
 
+def download_myinstants_com():
+    WEBPAGE = 'https://www.myinstants.com'
+    response = requests.get(WEBPAGE)
+    response.raise_for_status()
+
+    soup = BeautifulSoup(response.text, 'html.parser')
+    descriptions = []
+    urls = []
+    for page in range(1, int(soup.select('ul[class="pagination"]')
+                      [0].contents[2].strip("\n").split(" ")[2])):
+        response = requests.get(
+                'https://www.myinstants.com' + '/?page=' + str(page))
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, 'html.parser')
+        descriptions = descriptions + [title.getText()
+                                       for title in soup.select
+                                       ('div[class="instant"] > a')]
+        urls = urls + [WEBPAGE + x.get('onclick').split("'")[1]
+                       for x in soup.select
+                       ('div[class="instant"] > div[class="small-button"]')]
+    return zip(urls, descriptions)
+
+
 def create_schema(index_directory):
     schema = Schema(url=ID(stored=True),
                     title=TEXT(stored=True),
@@ -109,6 +132,10 @@ def create_schema(index_directory):
             writer.add_document(url=sound,
                                 title='Dota2 %s '%name+description,
                                 description='Dota2 %s '%name+description)
+    for url, description in download_myinstants_com():
+        writer.add_document(url=url,
+                            title=description,
+                            description=description)
 
 
 if __name__ == '__main__':
