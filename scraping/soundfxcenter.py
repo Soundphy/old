@@ -44,9 +44,9 @@ def parse_html(html_directory, csv_path, keywords):
                 title = audio.find_previous('table').find('strong').text
                 if title.lower().endswith(' sound effect'):
                     title = title[:-len(' sound effect')]
-                for kw in kwlist:
-                    if title.lower().startswith(kw.lower() + ' '):
-                        title = title[len(kw):].strip()
+                for keyword in kwlist:
+                    if title.lower().startswith(keyword.lower() + ' '):
+                        title = title[len(keyword):].strip()
                 full_title = kwlist[0] + ' ' + title
                 description = ' '.join(kwlist + [title])
                 writer.writerow([identifier, url, full_title, description])
