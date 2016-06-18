@@ -1,6 +1,6 @@
+from importlib import import_module
+
 from scraping.common import *
-from scraping.soundfxcenter import parse_html
-from scraping.soundfxcenter import download_html
 
 
 SERVICES = {
@@ -83,6 +83,11 @@ SERVICES = {
         dict(name='disney',
              keywords='Disney',
              route='/sound-effects/disney/'),
+    ],
+    'dota2gamepedia': [
+        dict(name='heroes',
+             keywords='Dota 2, Dota2, Heroes',
+             route='/Hero_Grid'),
     ]
 }
 
@@ -96,8 +101,10 @@ if __name__ == '__main__':
             html_dir = os.path.join(output_path, 'html')
             audio_dir = os.path.join(output_path, 'audio')
             csv_path = os.path.join(output_path, 'audio.csv')
+            # Module import
+            module = import_module('scraping.%s' % service)
             # Download
-#            download_html(section['route'], html_dir)
-            parse_html(html_dir, csv_path, section['keywords'])
+#            module.download_html(section['route'], html_dir)
+#            module.parse_html(html_dir, csv_path, section['keywords'])
             fill_index('indexdir', csv_path)
 #            download_audio(csv_path, audio_dir)
