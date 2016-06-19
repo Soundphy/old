@@ -1,0 +1,9 @@
+APP_NAME=soundphy
+
+rhc app delete $APP_NAME --confirm
+rhc app create $APP_NAME python-3.3 --no-git --repo ./
+
+GIT_URL=$(rhc show-app $APP_NAME | grep "Git URL" | awk '{print $NF}')
+git remote remove openshift
+git remote add openshift $GIT_URL
+git push openshift master:master -f
