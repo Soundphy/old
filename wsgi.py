@@ -1,10 +1,12 @@
+"""
+Web Server Gateway Interface.
+"""
 import os
 import soundphy
 
 
-# TODO: database file is destroyed on deployment. Maybe it should be stored in
-#       OPENSHIFT_DATA_DIR in the future (when the database is more stable)
-soundphy.INDEXDIR = os.path.join(os.path.dirname(__file__), soundphy.INDEXDIR)
+DATA_DIR = os.environ.get('OPENSHIFT_DATA_DIR', os.path.dirname(__file__))
+soundphy.INDEXDIR = os.path.join(DATA_DIR, soundphy.INDEXDIR)
 application = soundphy.app
 
 
