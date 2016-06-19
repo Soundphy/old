@@ -21,13 +21,6 @@ def download_html(route, output_directory):
     with open(path, 'w') as fout:
         fout.write(response.text)
 
-    lines = response.text.split('\n')
-    buttons = [x for x in lines if 'type="audio' in x]
-    descriptions = [BeautifulSoup(x).text for x in lines if 'class="description' in x]
-    title = [re.findall('title="([^"]*)', x)[0] for x in buttons]
-    urls = [webpage + re.findall('source src="([^"]*mp3)', x)[0]
-            for x in buttons]
-
 
 def parse_html(html_directory, csv_path, keywords):
     webpage = 'http://www.instantsfun.es'
