@@ -88,7 +88,17 @@ SERVICES = {
         dict(name='heroes',
              keywords='Dota 2, Dota2, Heroes',
              route='/Hero_Grid'),
-    ]
+    ],
+    'springfieldfiles': [
+        dict(name='sounds',
+             keywords='The Sympsons',
+             route='index.php?jump=sounds'),
+    ],
+    'instantsfun': [
+        dict(name='sounds',
+             keywords='',
+             route='/'),
+    ],
 }
 
 
@@ -106,5 +116,5 @@ if __name__ == '__main__':
             # Download
 #            module.download_html(section['route'], html_dir)
 #            module.parse_html(html_dir, csv_path, section['keywords'])
-            fill_index('indexdir', csv_path)
+#            fill_index('indexdir', csv_path)
 #            download_audio(csv_path, audio_dir)
