@@ -54,7 +54,7 @@ SERVICES = {
              keywords='Futurama',
              route='/sound-effects/futurama/'),
         dict(name='simpsons',
-             keywords='The Sympsons',
+             keywords='The Simpsons',
              route='/sound-effects/the-simpsons/'),
         dict(name='bigbang',
              keywords='The Big Bang Theory',
@@ -91,7 +91,7 @@ SERVICES = {
     ],
     'springfieldfiles': [
         dict(name='sounds',
-             keywords='The Sympsons',
+             keywords='The Simpsons',
              route='index.php?jump=sounds'),
     ],
     'instantsfun': [
