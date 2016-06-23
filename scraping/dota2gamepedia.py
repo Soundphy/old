@@ -8,8 +8,7 @@ from hashlib import sha1
 import requests
 from bs4 import BeautifulSoup
 
-
-def download_html(route, output_directory):
+def urls(route):
     webpage = 'http://dota2.gamepedia.com'
     response = requests.get(webpage + route)
     response.raise_for_status()
@@ -20,16 +19,7 @@ def download_html(route, output_directory):
     for hero in heroes:
         page = hero.find('a').attrs['href']
         name = hero.find('a').attrs['title']
-        response = requests.get(webpage + page + '/Responses')
-        try:
-            response.raise_for_status()
-        except Exception:
-            continue
-        print('Saving %s...' % name)
-        path = os.path.join(output_directory, name)
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, 'w') as fout:
-            fout.write(response.text)
+        yield name, webpage + page + '/Responses'
 
 
 def parse_html(html_directory, csv_path, keywords):

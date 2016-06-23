@@ -10,16 +10,10 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def download_html(route, output_directory):
-    webpage = 'http://www.instantsfun.es'
-    response = requests.get(webpage + route)
-    response.raise_for_status()
+def urls(route):
+    webpage = 'http://www.instantsfun.es' + route
     name = 'all'
-    print('Saving %s...' % name)
-    path = os.path.join(output_directory, name)
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, 'w') as fout:
-        fout.write(response.text)
+    yield name, webpage
 
 
 def parse_html(html_directory, csv_path, keywords):
