@@ -8,7 +8,8 @@ from hashlib import sha1
 import requests
 from bs4 import BeautifulSoup
 
-def urls(route):
+
+def pages(route):
     webpage = 'http://dota2.gamepedia.com'
     response = requests.get(webpage + route)
     response.raise_for_status()

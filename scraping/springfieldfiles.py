@@ -10,7 +10,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def download_html(route, output_directory):
+def pages(route):
     webpage = 'http://www.springfieldfiles.com/'
     response = requests.get(webpage + route)
     response.raise_for_status()
@@ -25,18 +25,8 @@ def download_html(route, output_directory):
         if not aux:
             continue
         url = aux[0]
-        response = requests.get(webpage + url)
-        try:
-            response.raise_for_status()
-        except Exception as e:
-            print(e)
-            continue
         fname = name + '_' + url.split('sounds/')[-1]
-        print('Saving %s...' % name)
-        path = os.path.join(output_directory, fname)
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, 'w') as fout:
-            fout.write(response.text)
+        yield fname, webpage + url
 
 
 def parse_html(html_directory, csv_path, keywords):

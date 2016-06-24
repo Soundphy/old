@@ -2,6 +2,7 @@
 Scraping module for soundfxcenter.
 """
 import os
+import re
 import csv
 from hashlib import sha1
 
@@ -9,24 +10,13 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def download_html(route, output_directory):
-    i = 0
-    while True:
-        webpage = 'http://soundfxcenter.com' + route + str(i)
-        response = requests.get(webpage)
-        i += 10
-        try:
-            response.raise_for_status()
-        except Exception as e:
-            print(e)
-            continue
-        print('Saving %s...' % webpage)
-        path = os.path.join(output_directory, str(i))
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, 'w') as fout:
-            fout.write(response.text)
-        if '>>>' not in response.text:
-            break
+def pages(route):
+    webpage = 'http://soundfxcenter.com' + route
+    response = requests.get(webpage + '0')
+    response.raise_for_status()
+    last = int(re.findall('\/([0-9]*)">>>', response.text)[-1])
+    for i in range(0, last + 10, 10):
+        yield str(i), webpage + str(i)
 
 
 def parse_html(html_directory, csv_path, keywords):

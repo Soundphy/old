@@ -2,6 +2,8 @@
 Common scraping classes and functions.
 """
 import os
+import sys
+import traceback
 from csv import DictReader
 
 import requests
@@ -29,14 +31,21 @@ def create_index(index_directory):
     create_in(index_directory, schema)
 
 
-def download_html(url_generator, url_path, output_directory):
-    for name, webpage in url_generator(url_path):
-        response = requests.get(webpage)
+def download_html(pages_generator, url_path, output_directory):
+    for name, page in pages_generator(url_path):
+        if isinstance(page, str):
+            assert page.startswith('http'), 'Page is expected to be an URL!'
+            response = requests.get(page)
+        elif isinstance(page, requests.models.Response):
+            response = page
+        else:
+            raise TypeError('Expecting an URL or a `Response`!')
         try:
             response.raise_for_status()
         except Exception:
+            sys.stderr.write(traceback.format_exc())
             continue
-        print('Saving %s (%s)...' % (name, webpage))
+        sys.stdout.write('Saving %s (%s)...\n' % (name, response.url))
         path = os.path.join(output_directory, name)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, 'w') as fout:

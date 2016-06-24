@@ -6,11 +6,10 @@ import re
 import csv
 from hashlib import sha1
 
-import requests
 from bs4 import BeautifulSoup
 
 
-def urls(route):
+def pages(route):
     webpage = 'http://www.instantsfun.es' + route
     name = 'all'
     yield name, webpage
