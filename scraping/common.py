@@ -9,6 +9,7 @@ from hashlib import sha1
 from csv import DictReader
 
 import requests
+from whoosh.fields import ID
 from whoosh.fields import STORED
 from whoosh.fields import NGRAMWORDS
 from whoosh.fields import Schema
@@ -25,7 +26,7 @@ def download_file(url, output_path):
 
 
 def create_index(index_directory):
-    schema = Schema(identifier=STORED,
+    schema = Schema(identifier=ID(stored=True, unique=True),
                     url=STORED,
                     title=STORED,
                     description=NGRAMWORDS(minsize=2))
@@ -89,7 +90,11 @@ def fill_index(index_directory, csv_path):
     index = open_dir(index_directory)
     writer = index.writer()
     finput = DictReader(open(csv_path))
+    ids = set()
     for row in finput:
+        if row['identifier'] in ids:
+            continue
+        ids.add(row['identifier'])
         writer.update_document(identifier=row['identifier'],
                                url=row['url'],
                                title=row['title'],
