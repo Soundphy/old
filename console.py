@@ -115,6 +115,6 @@ if __name__ == '__main__':
             module = import_module('scraping.%s' % service)
             # Download
 #            download_html(module.pages, section['url_path'], html_dir)
-#            module.parse_html(html_dir, csv_path, section['keywords'])
+#            write_csv(module.sounds, html_dir, csv_path, section['keywords'])
 #            fill_index('indexdir', csv_path)
 #            download_audio(csv_path, audio_dir)

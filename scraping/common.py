@@ -2,8 +2,10 @@
 Common scraping classes and functions.
 """
 import os
+import csv
 import sys
 import traceback
+from hashlib import sha1
 from csv import DictReader
 
 import requests
@@ -50,6 +52,26 @@ def download_html(pages_generator, url_path, output_directory):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, 'w') as fout:
             fout.write(response.text)
+
+
+def write_csv(sounds_generator, html_directory, csv_path, keywords):
+    with open(csv_path, 'w') as fout:
+        writer = csv.writer(fout)
+        writer.writerow(['identifier', 'url', 'title', 'description'])
+        kwlist = [x.strip() for x in keywords.split(',')]
+        for name in os.listdir(html_directory):
+            with open(os.path.join(html_directory, name)) as fin:
+                text = fin.read()
+            for url, title, description in sounds_generator(text):
+                identifier = sha1(url.encode('ascii')).hexdigest()
+                for keyword in kwlist:
+                    if title.lower().startswith(keyword.lower() + ' '):
+                        title = title[len(keyword):].strip()
+                if '_' in name:
+                    title = name.split('_')[0] + ' ' + title
+                full_title = kwlist[0] + ' ' + title
+                description = ' '.join(kwlist + [title, description])
+                writer.writerow([identifier, url, full_title, description])
 
 
 def download_audio(csv_path, output_directory):
