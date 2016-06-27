@@ -11,8 +11,6 @@ from flask import abort
 from flask import request
 from flask import jsonify
 
-from download import create_schema
-
 
 INDEXDIR = 'indexdir'
 
@@ -86,18 +84,6 @@ def search(query):
             QueryParser('description', ix.schema).parse(query)
         )]
     return jsonify(results=results)
-
-
-@app.route('/v0/_download')
-def _download():
-    """
-    Fill the database with new data.
-    """
-    try:
-        create_schema(INDEXDIR)
-    except Exception:
-        return jsonify(error=traceback.format_exc())
-    return jsonify(finished='OK')
 
 
 @app.route('/<path:path>', methods=['GET', 'POST'])
