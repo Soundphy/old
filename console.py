@@ -99,6 +99,11 @@ SERVICES = {
              keywords='',
              url_path='/'),
     ],
+#    'myinstants': [
+#        dict(name='sounds',
+#             keywords='',
+#             url_path='/'),
+#    ],
 }
 
 
