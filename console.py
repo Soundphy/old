@@ -1,6 +1,12 @@
+import os
+import time
 from importlib import import_module
 
-from scraping.common import *
+from scraping.common import write_csv
+from scraping.common import fill_index
+from scraping.common import create_index
+from scraping.common import download_html
+from scraping.common import download_audio
 
 
 SERVICES = {
@@ -102,19 +108,31 @@ SERVICES = {
 }
 
 
+def process(service, section, html=False, csv=False, fill=False, audio=False):
+    # Paths
+    output_path = os.path.join('data', service+'_'+section['name'])
+    html_dir = os.path.join(output_path, 'html')
+    audio_dir = os.path.join(output_path, 'audio')
+    csv_path = os.path.join(output_path, 'audio.csv')
+    # Module import
+    module = import_module('scraping.%s' % service)
+    # Download
+    if html:
+        download_html(module.pages, section['url_path'], html_dir)
+    if csv:
+        write_csv(module.sounds, html_dir, csv_path, section['keywords'])
+    if fill:
+        fill_index('indexdir', csv_path)
+    if audio:
+        download_audio(csv_path, audio_dir)
+
+
 if __name__ == '__main__':
-#    create_index('indexdir')
+    t0 = time.time()
+    create_index('indexdir')
     for service, sections in SERVICES.items():
         for section in sections:
-            # Paths
-            output_path = os.path.join('data', service+'_'+section['name'])
-            html_dir = os.path.join(output_path, 'html')
-            audio_dir = os.path.join(output_path, 'audio')
-            csv_path = os.path.join(output_path, 'audio.csv')
-            # Module import
-            module = import_module('scraping.%s' % service)
-            # Download
-#            download_html(module.pages, section['url_path'], html_dir)
-#            write_csv(module.sounds, html_dir, csv_path, section['keywords'])
-#            fill_index('indexdir', csv_path)
-#            download_audio(csv_path, audio_dir)
+            process(service, section,
+                    html=False, csv=False, fill=False, audio=False)
+    t1 = time.time()
+    print(t1 - t0)
