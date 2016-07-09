@@ -81,7 +81,7 @@ def search(query):
     ix = open_dir(INDEXDIR)
     with ix.searcher() as searcher:
         results = [dict(x) for x in searcher.search(
-            QueryParser('description', ix.schema).parse(query)
+            QueryParser('query', ix.schema).parse(query)
         )]
     return jsonify(results=results)
 

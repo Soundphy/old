@@ -10,13 +10,13 @@ from csv import DictReader
 
 import requests
 from whoosh.fields import ID
+from whoosh.fields import TEXT
 from whoosh.fields import STORED
 from whoosh.fields import NGRAMWORDS
 from whoosh.fields import Schema
 from whoosh.index import open_dir
 from whoosh.index import create_in
 from whoosh.analysis import CharsetFilter, StemmingAnalyzer
-from whoosh import fields
 from whoosh.support.charset import accent_map
 
 
@@ -30,10 +30,14 @@ def download_file(url, output_path):
 
 def create_index(index_directory):
     my_analyzer = StemmingAnalyzer() | CharsetFilter(accent_map)
-    schema = fields.Schema(identifier=ID(stored=True, unique=True),
+    schema = Schema(identifier=ID(stored=True, unique=True),
                     url=STORED,
+                    category=STORED,
+                    section=STORED,
+                    subsection=STORED,
                     title=STORED,
-                    description=fields.TEXT(analyzer=my_analyzer))
+                    description=STORED,
+                    query=TEXT(stored=True, analyzer=my_analyzer))
     os.makedirs(index_directory, exist_ok=True)
     create_in(index_directory, schema)
 
@@ -59,24 +63,33 @@ def download_html(pages_generator, url_path, output_directory):
             fout.write(response.text)
 
 
-def write_csv(sounds_generator, html_directory, csv_path, keywords):
+def write_csv(sounds_generator, html_directory, csv_path, category, section):
     with open(csv_path, 'w') as fout:
         writer = csv.writer(fout)
-        writer.writerow(['identifier', 'url', 'title', 'description'])
-        kwlist = [x.strip() for x in keywords.split(',')]
+        writer.writerow(['identifier', 'url', 'category', 'section',
+                         'subsection', 'title', 'description'])
+        sectionlist = [x.strip() for x in section.split(',')]
         for name in os.listdir(html_directory):
             with open(os.path.join(html_directory, name)) as fin:
                 text = fin.read()
-            for url, title, description in sounds_generator(text):
+            for item in sounds_generator(text):
+                if len(item) == 3:
+                    url, title, description = item
+                elif len(item) == 2:
+                    url, title = item
+                    description = ''
+                else:
+                    raise ValueError('Unsupported `sounds()` implementation!')
                 identifier = sha1(url.encode('ascii')).hexdigest()
-                for keyword in kwlist:
-                    if title.lower().startswith(keyword.lower() + ' '):
-                        title = title[len(keyword):].strip()
+                for s in sectionlist:
+                    if title.lower().startswith(s.lower() + ' '):
+                        title = title[len(s):].strip()
                 if '_' in name:
-                    title = name.split('_')[0] + ' ' + title
-                full_title = kwlist[0] + ' ' + title
-                description = ' '.join(kwlist + [title, description])
-                writer.writerow([identifier, url, full_title, description])
+                    subsection = '_'.join(name.split('_')[:-1])
+                else:
+                    subsection = ''
+                writer.writerow([identifier, url, category, section,
+                                 subsection, title, description])
 
 
 def download_audio(csv_path, output_directory):
@@ -99,8 +112,7 @@ def fill_index(index_directory, csv_path):
         if row['identifier'] in ids:
             continue
         ids.add(row['identifier'])
-        writer.update_document(identifier=row['identifier'],
-                               url=row['url'],
-                               title=row['title'],
-                               description=row['description'])
+        row['query'] = ' '.join(value for key, value in row.items()
+                                if key not in ['identifier', 'url'])
+        writer.update_document(**row)
     writer.commit()

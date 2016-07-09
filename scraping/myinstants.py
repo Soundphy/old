@@ -25,5 +25,4 @@ def sounds(html_content):
             for x in soup.select(
                 'div[class="instant"] > div[class="small-button"]')]
     for url, title in zip(urls, titles):
-        description = title
-        yield url, title, description
+        yield url, title
