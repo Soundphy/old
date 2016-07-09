@@ -11,7 +11,10 @@ def pages(route):
     webpage = 'http://soundfxcenter.com' + route
     response = requests.get(webpage + '0')
     response.raise_for_status()
-    last = int(re.findall('\/([0-9]*)">>>', response.text)[-1])
+    try:
+        last = int(re.findall('\/([0-9]*)">>>', response.text)[-1])
+    except IndexError:
+        last = 0
     for i in range(0, last + 10, 10):
         yield str(i), webpage + str(i)
 
