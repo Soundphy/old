@@ -26,4 +26,4 @@ def sounds(html_content):
         title = audio.find_previous('table').find('strong').text
         if title.lower().endswith(' sound effect'):
             title = title[:-len(' sound effect')]
-        yield url, title
+        yield dict(url=url, title=title)

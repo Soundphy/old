@@ -27,4 +27,4 @@ def sounds(html_content):
     titles = [link.parent.text.strip(' Play ') for link in links]
 
     for url, title in zip(urls, titles):
-        yield url, title
+        yield dict(url=url, title=title)

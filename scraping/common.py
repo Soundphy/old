@@ -72,14 +72,10 @@ def write_csv(sounds_generator, html_directory, csv_path, category, section):
         for name in os.listdir(html_directory):
             with open(os.path.join(html_directory, name)) as fin:
                 text = fin.read()
-            for item in sounds_generator(text):
-                if len(item) == 3:
-                    url, title, description = item
-                elif len(item) == 2:
-                    url, title = item
-                    description = ''
-                else:
-                    raise ValueError('Unsupported `sounds()` implementation!')
+            for sound in sounds_generator(text):
+                url = sound.get('url')
+                title = sound.get('title')
+                description = sound.get('description')
                 identifier = sha1(url.encode('ascii')).hexdigest()
                 for s in sectionlist:
                     if title.lower().startswith(s.lower() + ' '):

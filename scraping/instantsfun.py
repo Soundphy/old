@@ -24,4 +24,4 @@ def sounds(html_content):
         line = lines.pop()
         title = re.findall('title="([^"]*)', line)[0].strip()
         url = webpage + re.findall('source src="([^"]*mp3)', line)[0]
-        yield url, title, description
+        yield dict(url=url, title=title, description=description)

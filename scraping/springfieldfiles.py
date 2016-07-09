@@ -40,4 +40,4 @@ def sounds(html_content):
             continue
         url = webpage + sound[0]
         title = title.strip('"')
-        yield url, title
+        yield dict(url=url, title=title)
