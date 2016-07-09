@@ -81,7 +81,7 @@ SERVICES = {
              url_path='/sound-effects/the-simpsons/'),
         dict(name='bigbang',
              category='TV Series',
-             section='The Big Bang Theory',
+             section='The Big Bang Theory, BBT',
              url_path='/sound-effects/the-big-bang-theory/'),
         dict(name='southpark',
              category='TV Series',
@@ -119,7 +119,7 @@ SERVICES = {
     'dota2gamepedia': [
         dict(name='heroes',
              category='Video Games',
-             section='Dota 2, Dota2, Heroes',
+             section='Dota 2, Dota2',
              url_path='/Hero_Grid'),
     ],
     'springfieldfiles': [
@@ -130,13 +130,13 @@ SERVICES = {
     ],
     'instantsfun': [
         dict(name='sounds',
-             category='Various',
+             category='',
              section='',
              url_path='/'),
     ],
 #    'myinstants': [
 #        dict(name='sounds',
-#             category='Various',
+#             category='',
 #             section='',
 #             url_path='/'),
 #    ],
