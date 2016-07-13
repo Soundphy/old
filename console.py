@@ -13,11 +13,13 @@ SERVICES = {
     'soundfxcenter': [
         dict(name='starcraft',
              category='Video Games',
-             section='StarCraft, SC',
+             section='StarCraft',
+             more='SC',
              url_path='/sound-effects/starcraft/'),
         dict(name='warcraft2',
              category='Video Games',
-             section='Warcraft 2, WC, Warcraft2',
+             section='Warcraft 2',
+             more='WC Warcraft2',
              url_path='/sound-effects/warcraft-2/'),
         dict(name='terminator',
              category='Movies',
@@ -57,7 +59,8 @@ SERVICES = {
              url_path='/sound-effects/star-wars/'),
         dict(name='lotr',
              category='Movies',
-             section='The Lord of the Rings, LotR',
+             section='The Lord of the Rings',
+             more='LotR',
              url_path='/sound-effects/the-lord-of-the-rings/'),
         dict(name='toystory',
              category='Movies',
@@ -65,7 +68,8 @@ SERVICES = {
              url_path='/sound-effects/toy-story/'),
         dict(name='walle',
              category='Movies',
-             section='Wall-E, WallE',
+             section='Wall-E',
+             more='WallE',
              url_path='/sound-effects/wall-e/'),
         dict(name='supermario',
              category='Video Games',
@@ -81,7 +85,8 @@ SERVICES = {
              url_path='/sound-effects/the-simpsons/'),
         dict(name='bigbang',
              category='TV Series',
-             section='The Big Bang Theory, BBT',
+             section='The Big Bang Theory',
+             more='BBT',
              url_path='/sound-effects/the-big-bang-theory/'),
         dict(name='southpark',
              category='TV Series',
@@ -119,7 +124,8 @@ SERVICES = {
     'dota2gamepedia': [
         dict(name='heroes',
              category='Video Games',
-             section='Dota 2, Dota2',
+             section='Dota 2',
+             more='Dota2',
              url_path='/Hero_Grid'),
     ],
     'springfieldfiles': [
@@ -130,14 +136,10 @@ SERVICES = {
     ],
     'instantsfun': [
         dict(name='sounds',
-             category='',
-             section='',
              url_path='/'),
     ],
 #    'myinstants': [
 #        dict(name='sounds',
-#             category='',
-#             section='',
 #             url_path='/'),
 #    ],
 }
@@ -156,7 +158,9 @@ def process(service, section, html=False, csv=False, fill=False, audio=False):
         download_html(module.pages, section['url_path'], html_dir)
     if csv:
         write_csv(module.sounds, html_dir, csv_path,
-                  section['category'], section['section'])
+                  section.get('category', ''),
+                  section.get('section', ''),
+                  section.get('more', ''))
     if fill:
         fill_index('indexdir', csv_path)
     if audio:

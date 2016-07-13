@@ -37,6 +37,7 @@ def create_index(index_directory):
                     subsection=STORED,
                     title=STORED,
                     description=STORED,
+                    more=STORED,
                     query=TEXT(stored=True, analyzer=my_analyzer))
     os.makedirs(index_directory, exist_ok=True)
     create_in(index_directory, schema)
@@ -63,11 +64,12 @@ def download_html(pages_generator, url_path, output_directory):
             fout.write(response.text)
 
 
-def write_csv(sounds_generator, html_directory, csv_path, category, section):
+def write_csv(sounds_generator, html_directory, csv_path, category, section,
+              more):
     with open(csv_path, 'w') as fout:
         writer = csv.writer(fout)
         writer.writerow(['identifier', 'url', 'category', 'section',
-                         'subsection', 'title', 'description'])
+                         'subsection', 'title', 'description', 'more'])
         sectionlist = [x.strip() for x in section.split(',')]
         for name in os.listdir(html_directory):
             with open(os.path.join(html_directory, name)) as fin:
@@ -85,7 +87,7 @@ def write_csv(sounds_generator, html_directory, csv_path, category, section):
                 else:
                     subsection = ''
                 writer.writerow([identifier, url, category, section,
-                                 subsection, title, description])
+                                 subsection, title, description, more])
 
 
 def download_audio(csv_path, output_directory):
@@ -109,6 +111,6 @@ def fill_index(index_directory, csv_path):
             continue
         ids.add(row['identifier'])
         row['query'] = ' '.join(value for key, value in row.items()
-                                if key not in ['identifier', 'url'])
+                                if key not in ['identifier', 'url'] and value)
         writer.update_document(**row)
     writer.commit()
