@@ -16,7 +16,7 @@ from whoosh.fields import NGRAMWORDS
 from whoosh.fields import Schema
 from whoosh.index import open_dir
 from whoosh.index import create_in
-from whoosh.analysis import CharsetFilter, StemmingAnalyzer
+from whoosh.analysis import CharsetFilter, StemmingAnalyzer, NgramFilter
 from whoosh.support.charset import accent_map
 
 
@@ -29,7 +29,9 @@ def download_file(url, output_path):
 
 
 def create_index(index_directory):
-    my_analyzer = StemmingAnalyzer() | CharsetFilter(accent_map)
+    my_analyzer = StemmingAnalyzer() \
+    | CharsetFilter(accent_map) | \
+    NgramFilter(minsize=2, maxsize=10, at='start')
     schema = Schema(identifier=ID(stored=True, unique=True),
                     url=STORED,
                     category=STORED,
