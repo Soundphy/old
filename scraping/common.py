@@ -18,6 +18,7 @@ from whoosh.index import open_dir
 from whoosh.index import create_in
 from whoosh.analysis import CharsetFilter, StemmingAnalyzer, NgramFilter
 from whoosh.support.charset import accent_map
+from whoosh.columns import RefBytesColumn
 
 
 def download_file(url, output_path):
@@ -29,13 +30,15 @@ def download_file(url, output_path):
 
 
 def create_index(index_directory):
-    my_analyzer = StemmingAnalyzer() \
-    | CharsetFilter(accent_map) | \
+    my_analyzer = StemmingAnalyzer() |\
+    CharsetFilter(accent_map) |\
     NgramFilter(minsize=2, maxsize=10, at='start')
+#    section_col=RefBytesColumn()
+# sortable=section_col
     schema = Schema(identifier=ID(stored=True, unique=True),
                     url=STORED,
                     category=STORED,
-                    section=STORED,
+                    section=ID(stored= True),
                     subsection=STORED,
                     title=STORED,
                     description=STORED,

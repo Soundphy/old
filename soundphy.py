@@ -5,6 +5,7 @@ import inspect
 import traceback
 from whoosh.index import open_dir
 from whoosh.qparser import QueryParser
+from whoosh.sorting import FieldFacet
 
 from flask import Flask
 from flask import abort
@@ -80,9 +81,11 @@ def search(query):
     """
     ix = open_dir(INDEXDIR)
     with ix.searcher() as searcher:
-        results = [dict(x) for x in searcher.search(
-            QueryParser('query', ix.schema).parse(query)
-        )]
+        section_facet = FieldFacet('section')
+        s = searcher.search(
+            QueryParser('query', ix.schema).parse(query),
+            collapse=section_facet)
+        results = [dict(x) for x in s]
     return jsonify(results=results)
 
 
