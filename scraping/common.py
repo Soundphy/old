@@ -30,16 +30,14 @@ def download_file(url, output_path):
 
 
 def create_index(index_directory):
-    my_analyzer = StemmingAnalyzer() |\
-    CharsetFilter(accent_map) |\
-    NgramFilter(minsize=2, maxsize=10, at='start')
-#    section_col=RefBytesColumn()
-# sortable=section_col
+    my_analyzer = StemmingAnalyzer() | \
+                  CharsetFilter(accent_map) | \
+                  NgramFilter(minsize=2, maxsize=10, at='start')
     schema = Schema(identifier=ID(stored=True, unique=True),
                     url=STORED,
-                    category=STORED,
-                    section=ID(stored= True),
-                    subsection=STORED,
+                    category=ID(stored=True),
+                    section=ID(stored=True),
+                    subsection=ID(stored=True),
                     title=STORED,
                     description=STORED,
                     more=STORED,
