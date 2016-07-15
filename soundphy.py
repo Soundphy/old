@@ -14,6 +14,7 @@ from flask import jsonify
 
 
 INDEXDIR = 'indexdir'
+RESULTS_LIMIT = 25
 
 app = Flask('Soundphy')
 
@@ -81,12 +82,24 @@ def search(query):
     """
     ix = open_dir(INDEXDIR)
     with ix.searcher() as searcher:
-        section_facet = FieldFacet('section')
-        s = searcher.search(
-            QueryParser('query', ix.schema).parse(query),
-            collapse=section_facet)
-        results = [dict(x) for x in s]
-    return jsonify(results=results)
+        facet = FieldFacet('section')
+        query = QueryParser('query', ix.schema).parse(query)
+        results = searcher.search(query, collapse=facet, limit=RESULTS_LIMIT)
+        response = [dict(x) for x in results]
+        if not len(response) or len(response) == RESULTS_LIMIT:
+            return jsonify(results=response)
+        if len(response) == 1:
+            results = searcher.search(query, limit=RESULTS_LIMIT)
+            response = [dict(x) for x in results]
+            return jsonify(results=response)
+        more = searcher.search(query, collapse=facet,
+                               collapse_limit=3, limit=RESULTS_LIMIT)
+        more = searcher.search(query, limit=RESULTS_LIMIT)
+        results.upgrade_and_extend(more)
+        more = searcher.search(query, limit=RESULTS_LIMIT)
+        results.upgrade_and_extend(more)
+        response = [dict(x) for x in results]
+        return jsonify(results=response[:RESULTS_LIMIT])
 
 
 @app.route('/v0/popular')
