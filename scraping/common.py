@@ -113,6 +113,7 @@ def fill_index(index_directory, csv_path):
         if row['identifier'] in ids:
             continue
         ids.add(row['identifier'])
+        row['title'] = row['title'].capitalize()
         row['query'] = ' '.join(value for key, value in row.items()
                                 if key not in ['identifier', 'url'] and value)
         writer.update_document(**row)
