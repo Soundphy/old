@@ -94,8 +94,10 @@ def search(query):
             return jsonify(results=response)
         more = searcher.search(query, collapse=facet,
                                collapse_limit=3, limit=RESULTS_LIMIT)
-        more = searcher.search(query, limit=RESULTS_LIMIT)
         results.upgrade_and_extend(more)
+        response = [dict(x) for x in results]
+        if len(response) >= RESULTS_LIMIT:
+            return jsonify(results=response[:RESULTS_LIMIT])
         more = searcher.search(query, limit=RESULTS_LIMIT)
         results.upgrade_and_extend(more)
         response = [dict(x) for x in results]
